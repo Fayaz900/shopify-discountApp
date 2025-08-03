@@ -5,13 +5,12 @@ import {
   TextField,
   ColorPicker,
   Select,
-  Button,
   Banner,
   BlockStack,
   InlineStack,
 } from '@shopify/polaris';
 
-// Convert Polaris ColorPicker HSB to CSS rgb string
+// Convert Polaris ColorPicker HSB color to CSS rgb string
 function hsbToRgbString({ hue, saturation, brightness }) {
   let c = brightness * saturation;
   let x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
@@ -51,6 +50,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
   const [timerPosition, setTimerPosition] = useState('Top');
   const [urgency, setUrgency] = useState('Color pulse');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const timerSizeOptions = [
     { label: 'Small', value: 'Small' },
@@ -76,7 +76,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
     return isNaN(combined.getTime()) ? null : combined.toISOString();
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!timerName.trim()) {
       setError('Timer name is required.');
       return;
@@ -100,6 +100,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
     }
 
     setError('');
+    setLoading(true);
 
     const timerData = {
       timerName: timerName.trim(),
@@ -112,7 +113,43 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
       urgency,
     };
 
-    onSubmit(timerData);
+    try {
+      const response = await fetch('http://localhost:4000/api/timers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-shop': 'demo-shop.myshopify.com', // Replace with actual shop ID/session in production
+        },
+        body: JSON.stringify(timerData),
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json();
+        setError(errorJson.error || 'Failed to create timer');
+        setLoading(false);
+        return;
+      }
+
+      // On success, optionally reset fields or close modal
+      setLoading(false);
+      onSubmit && onSubmit(timerData);
+      onClose();
+      // Reset form if needed:
+      setTimerName('');
+      setPromotion('');
+      setStartDate('');
+      setStartTime('');
+      setEndDate('');
+      setEndTime('');
+      setColor({ hue: 120, saturation: 1, brightness: 1 });
+      setTimerSize('Medium');
+      setTimerPosition('Top');
+      setUrgency('Color pulse');
+      setError('');
+    } catch (err) {
+      setError('Network error: ' + err.message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -124,8 +161,9 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
       }}
       title="Create New Timer"
       primaryAction={{
-        content: 'Create timer',
+        content: loading ? 'Creating...' : 'Create timer',
         onAction: handleSubmit,
+        disabled: loading,
       }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
     >
@@ -139,6 +177,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
             onChange={setTimerName}
             autoComplete="off"
             requiredIndicator
+            disabled={loading}
           />
 
           <TextField
@@ -146,6 +185,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
             value={promotion}
             onChange={setPromotion}
             multiline
+            disabled={loading}
           />
 
           <BlockStack gap="4" style={{ marginTop: '1rem' }}>
@@ -157,6 +197,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
                 onChange={setStartDate}
                 autoComplete="off"
                 required
+                disabled={loading}
               />
               <TextField
                 label="Start Time"
@@ -165,6 +206,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
                 onChange={setStartTime}
                 autoComplete="off"
                 required
+                disabled={loading}
               />
             </InlineStack>
 
@@ -176,6 +218,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
                 onChange={setEndDate}
                 autoComplete="off"
                 required
+                disabled={loading}
               />
               <TextField
                 label="End Time"
@@ -184,13 +227,14 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
                 onChange={setEndTime}
                 autoComplete="off"
                 required
+                disabled={loading}
               />
             </InlineStack>
           </BlockStack>
 
           <div style={{ marginTop: '1rem' }}>
             <p style={{ marginBottom: 4, fontWeight: '600' }}>Timer Color</p>
-            <ColorPicker color={color} onChange={setColor} allowAlpha={false} />
+            <ColorPicker color={color} onChange={setColor} allowAlpha={false} disabled={loading} />
           </div>
 
           <InlineStack gap="4" alignment="center" style={{ marginTop: '1rem' }}>
@@ -199,12 +243,14 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
               options={timerSizeOptions}
               value={timerSize}
               onChange={setTimerSize}
+              disabled={loading}
             />
             <Select
               label="Timer Position"
               options={timerPositionOptions}
               value={timerPosition}
               onChange={setTimerPosition}
+              disabled={loading}
             />
           </InlineStack>
 
@@ -214,6 +260,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
             value={urgency}
             onChange={setUrgency}
             style={{ marginTop: '1rem' }}
+            disabled={loading}
           />
         </FormLayout>
       </Modal.Section>

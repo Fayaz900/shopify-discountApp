@@ -1,7 +1,7 @@
 import '@shopify/polaris/build/esm/styles.css';
 import {AppProvider} from '@shopify/polaris';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import TimerPage from './components/TimerPage';
+import TimerManagerPage from './components/TimerPage';
 // ...import your pages
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <AppProvider i18n={{}}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<TimerPage />} />
+          <Route path="/" element={<TimerManagerPage />} />
         </Routes>
       </BrowserRouter>
     </AppProvider>
