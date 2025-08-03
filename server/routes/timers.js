@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// List Timers for shop
+// List Timers for shopp
 router.get('/', async (req, res) => {
   const shop = getShop(req);
   const timers = await Timer.find({ shop }).sort({ createdAt: -1 });
