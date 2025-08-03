@@ -22,5 +22,10 @@
   "private": true,
   "workspaces": [
     "extensions/*"
-  ]
+  ],
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.2",
+    "preact": "^10.27.0",
+    "vite": "^7.0.6"
+  }
 }
