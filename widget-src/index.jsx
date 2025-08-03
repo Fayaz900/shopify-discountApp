@@ -18,7 +18,7 @@ function CountdownTimerWidget({ shop, productId, apiBase }) {
   useEffect(() => {
     async function fetchTimer() {
       try {
-        let url = `${apiBase}/api/public/timers?shop=${encodeURIComponent(shop)}`;
+        let url = `${apiBase}/api/timers?shop=${encodeURIComponent(shop)}`;
         if (productId) url += `&productId=${encodeURIComponent(productId)}`;
         const resp = await fetch(url);
         if (!resp.ok) throw new Error('Failed to fetch timers');
@@ -115,7 +115,7 @@ if (container) {
   const productId = window.Shopify && window.Shopify.product ? window.Shopify.product.id : undefined;
   const apiBase =
     window.SHOPIFY_API_BASE_URL ||
-    'http://localhost:4000'; // Replace with your backend API URL or inject dynamically
+    'https://shopify-discountapp-production.up.railway.app'; // Replace with your backend API URL or inject dynamically
 
   render(
     <CountdownTimerWidget shop={shop} productId={productId} apiBase={apiBase} />,

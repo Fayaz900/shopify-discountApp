@@ -21,7 +21,7 @@ export default function TimerManagerPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('http://localhost:4000/api/timers', {
+      const response = await fetch('https://shopify-discountapp-production.up.railway.app/api/timers', {
         headers: {
           // Replace with actual shop/session authentication header in production
           'x-shop': 'demo-shop.myshopify.com',
@@ -50,7 +50,7 @@ export default function TimerManagerPage() {
     setDeleteLoadingId(id);
     setError('');
     try {
-      const response = await fetch(`http://localhost:4000/api/timers/${id}`, {
+      const response = await fetch(`https://shopify-discountapp-production.up.railway.app/api/timers/${id}`, {
         method: 'DELETE',
         headers: {
           'x-shop': 'demo-shop.myshopify.com',

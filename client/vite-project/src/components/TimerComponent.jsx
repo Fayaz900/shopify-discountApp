@@ -114,7 +114,7 @@ export default function TimerFormModal({ open, onClose, onSubmit }) {
     };
 
     try {
-      const response = await fetch('http://localhost:4000/api/timers', {
+      const response = await fetch('https://shopify-discountapp-production.up.railway.app/api/timers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
